@@ -1,0 +1,315 @@
+1.	Write Python program to implement Union, Intersection, Complement and Difference operations, De-morgan’s Law on fuzzy sets. Also create fuzzy relation by Cartesian product of any two fuzzy sets and perform max-min composition on any two fuzzy relations.
+
+import numpy as np 
+def union(fuzzy_set1, fuzzy_set2): 
+    return np.maximum(fuzzy_set1, fuzzy_set2) 
+def intersection(fuzzy_set1, fuzzy_set2): 
+    return np.minimum(fuzzy_set1, fuzzy_set2) 
+def complement(fuzzy_set): 
+    return 1 - fuzzy_set 
+def difference(fuzzy_set1, fuzzy_set2): 
+    return np.maximum(0, fuzzy_set1 - fuzzy_set2) 
+def de_morgans_law(fuzzy_set1, fuzzy_set2): 
+    left_hand_side = complement(intersection(fuzzy_set1, fuzzy_set2)) 
+    right_hand_side = union(complement(fuzzy_set1), complement(fuzzy_set2)) 
+    return np.allclose(left_hand_side, right_hand_side), left_hand_side, right_hand_side 
+def cartesian_product(fuzzy_set1, fuzzy_set2): 
+    return np.minimum.outer(fuzzy_set1, fuzzy_set2) 
+def max_min_composition(relation1, relation2): 
+    return np.maximum.reduce(np.minimum(relation1[:, :, np.newaxis], relation2[np.newaxis, :, 
+:]), axis=1) 
+# Example usage 
+fuzzy_set1 = np.array([0.2, 0.3, 0.6]) 
+fuzzy_set2 = np.array([0.8, 0.9, 0.8]) 
+print("Fuzzy Set 1:", fuzzy_set1) 
+print("Fuzzy Set 2:", fuzzy_set2) 
+# Union 
+union_result = union(fuzzy_set1, fuzzy_set2) 
+print("Union:", union_result) 
+# Intersection 
+intersection_result = intersection(fuzzy_set1, fuzzy_set2) 
+print("Intersection:", intersection_result) 
+# Complement 
+complement_result1 = complement(fuzzy_set1) 
+complement_result2 = complement(fuzzy_set2) 
+print("Complement of Fuzzy Set 1:", complement_result1) 
+print("Complement of Fuzzy Set 2:", complement_result2) 
+# Difference 
+difference_result = difference(fuzzy_set1, fuzzy_set2) 
+print("Difference (Fuzzy Set 1 - Fuzzy Set 2):", difference_result) 
+# De Morgan's Law 
+is_valid, lhs, rhs = de_morgans_law(fuzzy_set1, fuzzy_set2) 
+print("De Morgan's Law holds:", is_valid) 
+print("LHS:", lhs) 
+print("RHS:", rhs) 
+# Cartesian Product 
+relation = cartesian_product(fuzzy_set1, fuzzy_set2) 
+print("Cartesian Product of Fuzzy Set 1 and Fuzzy Set 2:\n", relation) 
+# Max-Min Composition 
+relation1 = cartesian_product(fuzzy_set1, fuzzy_set2) 
+relation2 = cartesian_product(fuzzy_set2, fuzzy_set1) 
+composition_result = max_min_composition(relation1, relation2) 
+print("Max-Min Composition:\n", composition_result)
+
+
+
+Output:
+Fuzzy Set 1: [0.2 0.3 0.6]
+Fuzzy Set 2: [0.8 0.9 0.8]
+Union: [0.8 0.9 0.8]
+Intersection: [0.2 0.3 0.6]
+Complement of Fuzzy Set 1: [0.8 0.7 0.4]
+Complement of Fuzzy Set 2: [0.2 0.1 0.2]
+Difference (Fuzzy Set 1 - Fuzzy Set 2): [0. 0. 0.]
+De Morgan's Law holds: True
+LHS: [0.8 0.7 0.4]
+RHS: [0.8 0.7 0.4]
+Cartesian Product of Fuzzy Set 1 and Fuzzy Set 2:
+ [[0.2 0.2 0.2]
+ [0.3 0.3 0.3]
+ [0.6 0.6 0.6]]
+Max-Min Composition:
+ [[0.2 0.2 0.2]
+ [0.2 0.3 0.3]
+ [0.2 0.3 0.6]]
+
+2. Plot all the typical membership functions triangular, trapezoidal, and Gaussian.
+
+import numpy as np 
+import matplotlib.pyplot as plt 
+# Define membership functions 
+def triangular(x, a, b, c): 
+    return np.maximum(0, np.minimum((x - a) / (b - a), (c - x) / (c - b))) 
+def trapezoidal(x, a, b, c, d): 
+    return np.maximum(0, np.minimum((x - a) / (b - a), np.minimum(1, (d - x) / (d - c)))) 
+def gaussian(x, mean, sigma): 
+    return np.exp(-((x - mean) ** 2) / (2 * sigma ** 2)) 
+# Generate x values 
+x = np.linspace(0, 10, 500) 
+# Triangular membership function 
+triangular_y = triangular(x, 3, 6, 8) 
+# Trapezoidal membership function 
+trapezoidal_y = trapezoidal(x, 3, 5, 6, 7) 
+# Gaussian membership function 
+gaussian_y = gaussian(x, 5, 2) 
+# Plot membership functions 
+plt.figure(figsize=(10, 6)) 
+plt.plot(x, triangular_y, label="Triangular (a=3, b=6, c=8)", color="blue") 
+plt.plot(x, trapezoidal_y, label="Trapezoidal (a=3, b=5, c=6, d=7)", color="green") 
+plt.plot(x, gaussian_y, label="Gaussian (mean=5, sigma=2)", color="red") 
+plt.title("Typical Membership Functions") 
+plt.xlabel("x") 
+plt.ylabel("Membership Degree") 
+plt.legend() 
+plt.grid(True) 
+plt.show() 
+
+
+
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. Write a Python program to check whether a fuzzy set is normal.
+def is_normal_fuzzy_set(fuzzy_set): 
+    """ 
+    Check if a fuzzy set is normal. 
+    Args: 
+    fuzzy_set (list or numpy array): The membership degrees of the fuzzy set. 
+    Returns: 
+    bool: True if the fuzzy set is normal, False otherwise. 
+    """ 
+    return max(fuzzy_set) == 1.0 
+# Example usage 
+fuzzy_set1 = [0.2, 0.7, 1.0, 0.8]  # Normal fuzzy set 
+fuzzy_set2 = [0.2, 0.5, 0.2, 0.8]  # Not a normal fuzzy set 
+print(f"Fuzzy Set 1: {fuzzy_set1} is normal: {is_normal_fuzzy_set(fuzzy_set1)}") 
+print(f"Fuzzy Set 2: {fuzzy_set2} is normal: {is_normal_fuzzy_set(fuzzy_set2)}")
+
+
+Output:-
+Fuzzy Set 1: [0.2, 0.7, 1.0, 0.8] is normal: True
+Fuzzy Set 2: [0.2, 0.5, 0.2, 0.8] is normal: False
+
+4. Write a Python program to find the alpha-cut of a fuzzy set
+def alpha_cut(fuzzy_set, alpha): 
+       """ 
+    	       Calculate the alpha-cut of a fuzzy set. 
+    	       Args: 
+    	       fuzzy_set (dict): A dictionary representing the fuzzy set where keys are elements, and values are me
+    mbership degrees. 
+        	      alpha (float): The alpha threshold (0 <= alpha <= 1). 
+        	      Returns: 
+        	      list: A list of elements that satisfy the alpha-cut condition. 
+        	      """ 
+        	      if not (0 <= alpha <= 1): 
+            		raise ValueError("Alpha must be between 0 and 1.") 
+       	     return [element for element, membership in fuzzy_set.items() if membership >= alpha] 
+# Example usage 
+fuzzy_set = { 
+'a': 0.3, 
+'b': 0.4, 
+'c': 0.9, 
+'d': 1.1, 
+'e': 0.7 
+} 
+alpha = 0.5 
+result = alpha_cut(fuzzy_set, alpha) 
+print(f"Fuzzy Set: {fuzzy_set}") 
+print(f"Alpha: {alpha}") 
+print(f"Alpha-cut: {result}")
+
+Output:-
+Fuzzy Set: {'a': 0.3, 'b': 0.4, 'c': 0.9, 'd': 1.1, 'e': 0.7}
+Alpha: 0.5
+Alpha-cut: ['c', 'd', 'e']
+
+5. Write a Python program to check whether a fuzzy set is a singleton or not.
+def is_singleton_fuzzy_set(fuzzy_set): 
+    """ 
+    Check if a fuzzy set is a singleton. 
+    Args: 
+    fuzzy_set (dict): A dictionary representing the fuzzy set where keys are elements,  
+                      and values are membership degrees. 
+     
+    Returns: 
+    bool: True if the fuzzy set is a singleton, False otherwise. 
+    """ 
+    # Count elements with non-zero membership degree 
+    non_zero_memberships = sum(1 for membership in fuzzy_set.values() if membership > 0) 
+    return non_zero_memberships == 1 
+ 
+# Example usage 
+fuzzy_set1 = {'a': 0.3, 'b': 0.2, 'c': 1.0, 'd': 0.1}  # Singleton 
+fuzzy_set2 = {'a': 0.0, 'b': 0.5, 'c': 0.0, 'd': 0.2}  # Not a singleton 
+ 
+print(f"Fuzzy Set 1: {fuzzy_set1} is a singleton: {is_singleton_fuzzy_set(fuzzy_set1)}") 
+print(f"Fuzzy Set 2: {fuzzy_set2} is a singleton: {is_singleton_fuzzy_set(fuzzy_set2)}") 
+
+
+Output:-
+Fuzzy Set 1: {'a': 0.3, 'b': 0.2, 'c': 1.0, 'd': 0.1} is a singleton: False
+Fuzzy Set 2: {'a': 0.0, 'b': 0.5, 'c': 0.0, 'd': 0.2} is a singleton: False
+
+6. Write a Python program to check the convexity of a fuzzy set.
+import numpy as np
+def is_convex_fuzzy_set(domain, membership_function): 
+    """ 
+    Check if a fuzzy set is convex. 
+     
+    Args: 
+    domain (list or numpy array): The domain (elements) of the fuzzy set. 
+    membership_function (dict): A dictionary where keys are elements of the domain 
+                                 and values are their membership degrees. 
+     
+    Returns: 
+    bool: True if the fuzzy set is convex, False otherwise. 
+    """ 
+    domain_sorted = sorted(domain) 
+     
+    for i in range(len(domain_sorted) - 1): 
+        x = domain_sorted[i] 
+        y = domain_sorted[i + 1] 
+        mu_x = membership_function[x] 
+        mu_y = membership_function[y] 
+         
+        # Check for lambda between 0 and 1 
+        for lambda_val in np.linspace(0, 1, 10):  # Checking 10 points between 0 and 1 
+            z = lambda_val * x + (1 - lambda_val) * y 
+            mu_z = membership_function.get(z, min(mu_x, mu_y))  # Default if z is not in domain 
+            if mu_z < min(mu_x, mu_y): 
+                return False 
+     
+    return True 
+ 
+# Example usage 
+domain = [0, 1, 2, 3, 4, 5] 
+membership_function = { 
+    0: 0.6, 
+    1: 0.5, 
+    2: 1.0, 
+    3: 0.8, 
+    4: 0.4, 
+    5: 0.1 
+} 
+print(f"Fuzzy Set: {membership_function} is convex: {is_convex_fuzzy_set(domain, membership_function)}")
+
+Output:-
+	Fuzzy Set: {0: 0.6, 1: 0.5, 2: 1.0, 3: 0.8, 4: 0.4, 5: 0.1} is convex: True
+
+
+7. Implement De-fuzzification methods by taking user input 
+a) Maxima method 	
+b) Centroid method 
+c) Weighted average 
+
+class FuzzySet: 
+    def _init_(self, elements, membership_values): 
+        self.elements = elements 
+        self.membership_values = membership_values 
+ 
+    # Maxima method 
+    def maxima_method(self): 
+        max_membership_value = max(self.membership_values) 
+        max_index = self.membership_values.index(max_membership_value) 
+        return self.elements[max_index] 
+ 
+    # Centroid method 
+    def centroid_method(self): 
+        numerator = sum([self.membership_values[i] * float(self.elements[i]) for i in range(len(self.elements))]) 
+        denominator = sum(self.membership_values) 
+        return numerator / denominator if denominator != 0 else 0 
+ 
+    # Weighted average method 
+    def weighted_average_method(self): 
+        numerator = sum([self.membership_values[i] * float(self.elements[i]) for i in range(len(self.elements))]) 
+        denominator = sum(self.membership_values) 
+        return numerator / denominator if denominator != 0 else 0 
+ 
+    # Display the fuzzy set 
+    def display(self): 
+        return dict(zip(self.elements, self.membership_values)) 
+ 
+ 
+# Helper function to take user input for fuzzy set 
+def input_fuzzy_set(): 
+    elements = input("Enter the elements of the fuzzy set (comma-separated): ").split(",") 
+    membership_values = list(map(float, input("Enter the membership values (comma-separated): ").split(","))) 
+    return FuzzySet(elements, membership_values) 
+ 
+# Main program 
+def perform_operations(): 
+# Input for fuzzy set 
+    print("Input for Fuzzy Set:") 
+    fuzzy_set = input_fuzzy_set() 
+    # Display the fuzzy set 
+    print("\nFuzzy Set:", fuzzy_set.display()) 
+    # Perform Maxima Method 
+    print("\nMaxima Method Result:", fuzzy_set.maxima_method()) 
+    # Perform Centroid Method 
+    print("\nCentroid Method Result:", fuzzy_set.centroid_method()) 
+    # Perform Weighted Average Method 
+    print("\nWeighted Average Method Result:", fuzzy_set.weighted_average_method()) 
+# Run the program 
+perform_operations()
+Output:-
+	Enter the elements of the fuzzy set (comma-separated): 10,20,30,40,50 
+Enter the membership values (comma-separated): 0.9,0.6,0.8,0.7,0.5 
+Fuzzy Set: {'10': 0.9, '20': 0.6, '30': 0.8, '40': 0.7, '50': 0.5} 
+Maxima Method Result: 10 
+Centroid Method Result: 21.6 
+Weighted Average Method Result: 21.6
